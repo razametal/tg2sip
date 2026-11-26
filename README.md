@@ -232,6 +232,15 @@ Or only forward a specific DID:
 ```ini
 exten => 12345,1,Dial(PJSIP/tg2sip,30)
 ```
+**Using FreePBX 17** add to `/etc/asterisk/extensions_custom.conf`
+```ini
+[from-telegram]
+exten => _+X.,1,Set(TG_PHONE=${PJSIP_HEADER(read,X-TG-Phone)})
+ same => n,Set(CALLERID(name)=${PJSIP_HEADER(read,X-TG-FirstName)} ${PJSIP_HEADER(read,X-TG-LastName)})
+ same => n,ExecIf($["${TG_PHONE}" != ""]?Set(CALLERID(num)=+${TG_PHONE}):Set(CALLERID(num)=TG${PJSIP_HEADER(read,X-TG-ID)}))
+ same => n,Verbose(X-TG-ID: ${PJSIP_HEADER(read,X-TG-ID)} / X-TG-Username: ${PJSIP_HEADER(read,X-TG-Username)} / X-TG-Phone: ${TG_PHONE})
+ same => n,Goto(from-pstn,${EXTEN},1)
+```
 
 **5. Reload Asterisk:**
 
